@@ -25,8 +25,28 @@
 
 
 	  public function saveAction() {
-		  echo "<pre>";
-		  print_r($this->getRequest()->getPost());
+		  if( $this->getRequest()->isPost() ) {
+			  $attributeId = $this->getRequest()->getParam('attribute');
+			  $products = $this->getRequest()->getParam('products');
+
+			  if( $products[0] == 'all' ) {
+				  $products = $this->_getAllConfigurableProducts();
+			  }
+			  
+			  try {
+				  $db = Mage::getSingleton('core/resource')->getConnection('core_write');
+				  foreach( $products as $product ) {
+					  $productId = is_object($product) ? $product->getEntityId() : $product;
+
+					  $sql = 'INSERT INTO catalog_product_super_attribute (`product_id`, `attribute_id`) VALUES ( '.$productId.', '.$attributeId.' )';
+					  $db->query($sql);
+				  }
+			  } catch( Exception $e ) {				  
+				  			  
+			  }			  
+			  $this->_getSession()->addSuccess(Mage::helper('atcp')->__('Attributes successfully added!'));
+			  $this->_redirect('*/*/');
+		  }
 	  }
 
 
