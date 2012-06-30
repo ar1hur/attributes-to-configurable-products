@@ -25,7 +25,7 @@
 			  'required' => true,
 			  'name' => 'attribute',
 			  'values' => $this->getParentBlock()->getAttributeValues(),
-			  'note' => Mage::helper('atcp')->__('Choose the Attribute which you will add.')
+			  'note' => Mage::helper('atcp')->__('Choose the attribute which you want to add.')
 		  ));
 
 		  $fieldset->addField('products', 'multiselect', array(
