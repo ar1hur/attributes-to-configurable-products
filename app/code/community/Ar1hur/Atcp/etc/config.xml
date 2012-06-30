@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<modules>
+		<Ar1hur_Atcp>
+			<version>0.1.0</version>			
+		</Ar1hur_Atcp>
+	</modules>		
+	<global>
+		<helpers>
+			<atcp>
+				<class>Ar1hur_Atcp_Helper</class>
+			</atcp>
+		</helpers>
+		<blocks> 
+			<atcp>
+				<class>Ar1hur_Atcp_Block</class>
+			</atcp>
+		</blocks>						
+	</global>	
+	<adminhtml>
+		<layout>
+			<updates>
+				<atcp>
+					<file>ar1hur_atcp.xml</file>
+				</atcp>
+			</updates>
+		</layout>
+	</adminhtml>
+	<admin>
+		<routers>
+			<adminhtml>
+				<args>
+					<modules>
+						<atcp before="Mage_Adminhtml">Ar1hur_Atcp_Adminhtml</atcp>
+					</modules>
+				</args>
+			</adminhtml>
+		</routers>
+	</admin>
+</config>		

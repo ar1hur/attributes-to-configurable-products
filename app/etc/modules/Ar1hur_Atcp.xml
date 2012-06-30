@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Ar1hur_Atcp>
+			<active>true</active>
+			<codePool>community</codePool>
+		</Ar1hur_Atcp>
+	</modules>
+</config>

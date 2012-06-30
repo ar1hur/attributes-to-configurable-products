@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config>
+	<menu>   
+		<catalog>
+			<children>
+				<atcp translate="title">
+					<title>Add attributes to configurable products</title>
+					<sort_order>50</sort_order>          
+					<action>adminhtml/atcp_catalog_product_attributes/</action>           
+				</atcp>
+			</children>
+		</catalog>
+	</menu>
+</config>
