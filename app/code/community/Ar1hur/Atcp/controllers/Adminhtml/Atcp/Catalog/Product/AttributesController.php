@@ -8,6 +8,14 @@
 		  $attributeValues = $this->_getAttributeValues();
 		  $productsValues = $this->_getProductsValues();
 
+		  if( count($attributeValues) == 0 ) {
+			  $this->_getSession()->addError(Mage::helper('atcp')->__('No attributes found!'));
+		  }
+
+		  if( count($productsValues) == 1 ) { // 1 = 'all products'
+			  $this->_getSession()->addError(Mage::helper('atcp')->__('No configurable products found!'));
+		  }
+
 		  $this->loadLayout();
 		  $block = $this->getLayout()->getBlock('atcp');
 		  $block->setAttributeValues($attributeValues);
