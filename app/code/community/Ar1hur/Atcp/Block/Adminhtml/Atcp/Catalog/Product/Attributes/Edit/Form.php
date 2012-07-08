@@ -25,18 +25,32 @@
 			  'required' => true,
 			  'name' => 'attribute',
 			  'values' => $this->getParentBlock()->getAttributeValues(),
-			  'note' => Mage::helper('atcp')->__('Choose the attribute which you want to add.')
+			  'note' => Mage::helper('atcp')->__('Choose the attribute which you want to add.<br/>NOTE: the attribute must be assigned to an attribute set!'),
+			  'onchange' => "
+				  new Ajax.Request('".$this->getProductsUrl()."', 
+				  { 
+					parameters: {value: this.options[this.selectedIndex].value}, 
+					method:'get', 
+					onSuccess: function(transport){ 
+						var response = transport.responseText; 												
+						$('products').update(response);
+					}
+				  })"
 		  ));
 
 		  $fieldset->addField('products', 'multiselect', array(
 			  'label' => Mage::helper('atcp')->__('Product(s)'),
 			  'class' => 'required-entry',
 			  'required' => true,
-			  'values' => $this->getParentBlock()->getProductsValues(),
 			  'name' => 'products'
 		  ));
 
 		  return parent::_prepareForm();
+	  }
+
+
+	  public function getProductsUrl() {
+		  return $this->getUrl('*/*/products');
 	  }
 
   }

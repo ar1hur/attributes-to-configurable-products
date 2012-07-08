@@ -6,33 +6,32 @@
 
 	  public function indexAction() {
 		  $attributeValues = $this->_getAttributeValues();
-		  $productsValues = $this->_getProductsValues();
 
 		  if( count($attributeValues) == 0 ) {
 			  $this->_getSession()->addError(Mage::helper('atcp')->__('No attributes found!'));
 		  }
 
-		  if( count($productsValues) == 1 ) { // 1 = 'all products'
-			  $this->_getSession()->addError(Mage::helper('atcp')->__('No configurable products found!'));
-		  }
-
 		  $this->loadLayout();
 		  $block = $this->getLayout()->getBlock('atcp');
-		  $block->setAttributeValues($attributeValues);
-		  $block->setProductsValues($productsValues);
+		  $block->setAttributeValues($attributeValues);		  
 		  $this->renderLayout();
 	  }
 
 
 	  public function saveAction() {
 		  if( $this->getRequest()->isPost() ) {
-			  $attributeId = $this->getRequest()->getParam('attribute');
+			  $value = $this->getRequest()->getParam('attribute');
+			  $value = explode('-', $value);
+			  
+			  $attributeSetId = $value[0];
+			  $attributeId = $value[1];
+			  
 			  $products = $this->getRequest()->getParam('products');
 
 			  if( $products[0] == 'all' ) {
-				  $products = $this->_getAllConfigurableProducts();
+				  $products = $this->_getAllConfigurableProducts($attributeSetId);
 			  }
-			  
+
 			  try {
 				  $db = Mage::getSingleton('core/resource')->getConnection('core_write');
 				  foreach( $products as $product ) {
@@ -41,21 +40,35 @@
 					  $sql = 'INSERT INTO catalog_product_super_attribute (`product_id`, `attribute_id`) VALUES ( '.$productId.', '.$attributeId.' )';
 					  $db->query($sql);
 				  }
-			  } catch( Exception $e ) {				  
-				  			  
-			  }			  
+			  } catch( Exception $e ) {
+				  
+			  }
 			  $this->_getSession()->addSuccess(Mage::helper('atcp')->__('Attributes successfully added!'));
 			  $this->_redirect('*/*/');
 		  }
 	  }
 
 
+	  public function productsAction() {
+		  $value = $this->getRequest()->getParam('value');
+		  $value = explode('-', $value);
+		  
+		  $options = $this->_getMultiselectOptions($value[0]);
+		  $html = '';
+		  foreach( $options as $option ) {
+			  $html .= "<option value=\"{$option['value']}\">{$option['label']}</option>\n";
+		  }
+		  echo $html;
+	  }
+
+
 	  protected function _getAttributeValues() {
 		  $values = array( );
+		  $values[0] = Mage::helper('atcp')->__('- Please choose -');
 
 		  $collection = $this->_getAllProductAttributes();
 		  foreach( $collection as $item ) {
-			  $values[$item->getAttributeId()] = $item->getFrontendLabel();
+			  $values[$item->getAttributeSetId().'-'.$item->getAttributeId()] = $item->getFrontendLabel();
 		  }
 		  return $values;
 	  }
@@ -71,20 +84,22 @@
 				  ->addFieldToFilter('is_global', 1)
 				  ->addFieldToFilter('is_configurable', 1)
 				  ->addFieldToFilter('frontend_input', 'select')
-				  ->addVisibleFilter()
+				  ->addVisibleFilter()				
 				  ->setOrder('frontend_label', 'ASC');
+		  // to get attribute set id 
+		  $collection->getSelect()->join('eav_entity_attribute', 'eav_entity_attribute.attribute_id = main_table.attribute_id', 'attribute_set_id');
 
 		  return $collection;
 	  }
 
 
-	  protected function _getProductsValues() {
+	  protected function _getMultiselectOptions($attributeSetId = null) {
 		  $values[] = array(
 			  'value' => 'all',
-			  'label' => Mage::helper('atcp')->__('All')
+			  'label' => Mage::helper('atcp')->__('All [shortcut]')
 		  );
 
-		  $collection = $this->_getAllConfigurableProducts();
+		  $collection = $this->_getAllConfigurableProducts($attributeSetId);
 		  foreach( $collection as $item ) {
 			  $values[] = array(
 				  'value' => $item->getEntityId(),
@@ -96,11 +111,15 @@
 	  }
 
 
-	  protected function _getAllConfigurableProducts() {
+	  protected function _getAllConfigurableProducts($attributeSetId = null) {
 		  $collection = Mage::getModel('catalog/product')->getCollection()
 				  ->addAttributeToSelect('name')
 				  ->addAttributeToFilter('type_id', 'configurable')
 				  ->addAttributeToSort('name', 'ASC');
+
+		  if( !is_null($attributeSetId) && is_numeric($attributeSetId) ) {
+			  $collection->addAttributeToFilter('attribute_set_id', $attributeSetId);
+		  }
 
 		  return $collection;
 	  }
