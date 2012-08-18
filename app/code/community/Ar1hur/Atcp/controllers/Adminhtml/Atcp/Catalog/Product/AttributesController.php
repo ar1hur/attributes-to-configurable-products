@@ -21,7 +21,7 @@
 	  public function saveAction() {
 		  if( $this->getRequest()->isPost() ) {
 			  $value = $this->getRequest()->getParam('attribute');
-			  $value = explode('-', $value);
+			  $value = explode('|', $value);
 			  
 			  $attributeSetId = $value[0];
 			  $attributeId = $value[1];
@@ -39,6 +39,9 @@
 
 					  $sql = 'INSERT INTO catalog_product_super_attribute (`product_id`, `attribute_id`) VALUES ( '.$productId.', '.$attributeId.' )';
 					  $db->query($sql);
+						
+						$sql = 'INSERT INTO catalog_product_super_attribute_label(`product_super_attribute_id`, `value`) VALUES ( '.$db->lastInsertId().', "'.$value[2].'")';
+						$db->query($sql);
 				  }
 			  } catch( Exception $e ) {
 				  
@@ -68,7 +71,7 @@
 
 		  $collection = $this->_getAllProductAttributes();
 		  foreach( $collection as $item ) {
-			  $values[$item->getAttributeSetId().'-'.$item->getAttributeId()] = $item->getFrontendLabel();
+			  $values[$item->getAttributeSetId().'|'.$item->getAttributeId().'|'.$item->getFrontendLabel()] = $item->getFrontendLabel();
 		  }
 		  return $values;
 	  }
@@ -91,6 +94,7 @@
 
 		  return $collection;
 	  }
+	
 
 
 	  protected function _getMultiselectOptions($attributeSetId = null) {
