@@ -6,7 +6,7 @@ Magento extension for adding new attributes to already existing configurable/sim
 ##installation
 just copy the app folder over your existing magento directory - that´s it.
 
-## use
+## usage
 
 ![screenshot](https://raw.github.com/ar1hur/attributes-to-configurable-products/master/README/navigation.jpg)
 
